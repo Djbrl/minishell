@@ -28,7 +28,7 @@ SRC_OTHER := main.c display.c exec.c utils/utils.c builtins/builtins_1.c \
 			 init.c builtins/builtins_2.c builtins/builtins_runner.c \
 			 utils/list_utils.c free.c envp.c expr.c utils/expr_utils.c \
 			 builtins/ftn_builtins.c utils/ftn_utils.c pipex/pipe.c\
-			 utils/cmd_list_utils.c\
+			 utils/check_quotes.c\
 
 SRC_PATH := src
 SRC_NAME := $(SRC_OTHER)

@@ -66,18 +66,10 @@ typedef struct s_cmd
 	char		*name[8];
 }				t_cmd;
 
-typedef struct s_cmd_list
-{
-	char				*cmd;
-	int					to_expand;
-	struct s_cmd_list	*next;
-}				t_cmd_list;
-
 typedef struct s_msh
 {
 	t_cmd		cmd;
 	t_env_var	*env;
-	t_cmd_list	*cmd_list;
 	char		*home;
 	char		*user;
 	char		*full_path;
@@ -133,8 +125,6 @@ void	read_buffer(t_msh *msh);
 void	parse_envp(t_msh *msh);
 void	exit_cmd(t_msh *msh);
 void	exit_shell(t_msh *msh);
-int		splitter(char *str, t_msh *msh);
-
 
 /*
 ** UTILS
@@ -146,6 +136,7 @@ void	free_split(char **array);
 void	flush_buffer(t_msh *msh);
 int		update_exit_status(t_msh *msh, int status);
 int		is_builtin(char *s, t_msh *msh);
+int		check_quotes(char *str);
 
 /*
 ** PIPE
