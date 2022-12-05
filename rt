@@ -1,8 +1,0 @@
-build
-ft_split_str.c
-include
-libft
-Makefile
-minishell
-rt
-src
