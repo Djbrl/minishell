@@ -61,13 +61,26 @@ void	expand_quotes(char *str)
 	// printf("%s\n", str_current);
 }
 
-char	*add_to_str(char *str, char c)
+void	free_str(char *str)
+{
+	int i = 0;
+
+	while (str[i])
+	{
+		free(str[i]);
+	}
+}
+
+char	*add_char_to_str(char *str, char c)
 {
 	char *rt;
+	char char_to_add[2];
+	int size;
 
-	rt = malloc(sizeof(rt) * (strlen(str) + 1));
-	strcat(str, &c);
-
+	size = ft_strlen(str) + 2;
+	char_to_add[0] = c;
+	char_to_add[1] = '\0';
+	rt = ft_strjoin(str, char_to_add);
 	return (rt);
 }
 
@@ -78,11 +91,11 @@ int	check_quotes(char *str)
 	int	single_quote;
 	int	double_quote;
 	char *final_string;
+	char *tmp;
 
 	i = 0;
 	single_quote = 0;
 	double_quote = 0;
-	// final_string = NULL;
 	final_string = ft_strdup("");
 	// char **split = ft_split_str(str, "\'\"");
 	// strcpy(final_string, "");
@@ -94,7 +107,6 @@ int	check_quotes(char *str)
 	i = 0;
 	while (str[i])
 	{
-			printf("0final str = %s\n", final_string);
 		inside_str_quotes = -1;
 		if (str[i] == '\'')
 		{
@@ -110,17 +122,18 @@ int	check_quotes(char *str)
 			i = inside_quote(str, i, str[i]);
 		else
 		{
-			final_string = add_to_str(final_string, str[i]);
-			printf("final str = %s\n", final_string);
-			// printf("final str = %s\n", final_string);
-			// final_string = strcat(final_string, &str[i]);
+			tmp = add_char_to_str(final_string, str[i]);
 			i++;
 		}
-
+		final_string = tmp;
+		if (tmp)
+			free(tmp);
 	}
-
+	printf("final str = %s\n", final_string);
 	if (single_quote % 2 != 0 || double_quote % 2 != 0)
 		return (EXIT_FAILURE);
 	expand_quotes(str);
+	free(final_string);
+	
 	return (EXIT_SUCCESS);
 }
