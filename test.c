@@ -1,47 +1,89 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+#include "include/minishell.h"
 
-char   *add_to_str(char *str, char c)
+void	free_array(char **str)
 {
-	char *rt;
+	int	i;
 
-	rt = malloc(strlen(str) + 2);
-	rt = strcat(str, &c);
+	i = 0;
+	while (str[i])
+	{
+		if (str[i])
+			free(str[i]);
+		i++;
+	}
+	*str = 0;
+	if (str)
+		free(str);
+}
 
-	return (rt);
+char	**expansion(char *str)
+{
+	int	i = 0;
+	int	j = 0;
+	char	**rt;
+
+	rt = ft_calloc(200, sizeof(rt));
+	while (str[i])
+	{
+		int k = 0;
+		if (str[i] != '\'' && str[i] != '"' && str[i] != ' ')
+		{
+			k = i;
+			while (str[i] && (str[i] != '\'' && str[i] != '"' && str[i] != ' '))
+				i++;
+			rt[j] = malloc(sizeof(char) * i - k + 1); 
+			ft_strlcpy(rt[j], &str[k], i - k + 1);
+			j++;
+		}
+		else if (str[i] == '\'')
+		{
+			i++;
+			k = i;
+			i++;
+			while (str[i] && str[i] != '\'')
+				i++;
+			if (str[i] && str[i] == '\'')
+				i++;
+			rt[j] = malloc(sizeof(char) * i - k + 1); 
+			ft_strlcpy(rt[j], &str[k], i - k);
+			j++;
+		}
+		else if (str[i] == '"')
+		{
+			i++;
+			k = i;
+			i++;
+			while (str[i] && str[i] != '\"')
+				i++;
+			if (str[i] && str[i] == '\"')
+				i++;
+			rt[j] = malloc(sizeof(char) * i - k + 1); 
+			ft_strlcpy(rt[j], &str[k], i - k);
+			j++;
+		}
+		else if (str[i] && str[i] == ' ')
+		{
+			while (str[i] && str[i] == ' ')
+				i++;
+		}
+	}
+	rt[j] = 0;
+	return(rt);
 }
 
 int main(int ac, char *av[])
 {
-    char *first = "bonjour";
-    char *str;
-    int i = 0;
+		char **tokens;
 
-    // Allocate initial memory for str
-    // str = malloc(1);
-    // if (!str)
-    // {
-    //     // malloc failed, handle the error
-    //     return 1;
-    // }
-    // str[0] = '\0';
-	str = strdup("");
-    if (ac > 1)
-    {
-        while (first[i])
-        {
-            str = add_to_str(str, first[i]);
-    printf("str = %s\n", str);
-            i++;
-        }
-    }
+		int i = 0;
+		tokens = expansion("mot_seul \"unephrase entiere\" \'entre quotes simples\'");
 
-
-    // Free str when we're done using it
-    free(str);
-
-    return 0;
+		while (tokens[i])
+		{
+			printf("tokens[%d] = '%s'\n", i, tokens[i]);
+			i++;
+		}
+		free_array(tokens);
+	return (0);
 }
-
 

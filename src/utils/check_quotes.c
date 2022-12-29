@@ -93,6 +93,7 @@ int	check_quotes(char *str)
 	char *final_string;
 	char *tmp;
 
+
 	i = 0;
 	single_quote = 0;
 	double_quote = 0;
@@ -107,27 +108,31 @@ int	check_quotes(char *str)
 	i = 0;
 	while (str[i])
 	{
-		inside_str_quotes = -1;
-		if (str[i] == '\'')
+		while (str[i] && (str[i] != '\'' && str[i] != '"' && str[i] != ' ' ))
 		{
-			single_quote++;
-			inside_str_quotes = i;
+			
 		}
-		else if (str[i] == '\"')
-		{
-			double_quote++;
-			inside_str_quotes = i;
-		}
-		if (str[i] == '\'' || str[i] == '\"')
-			i = inside_quote(str, i, str[i]);
-		else
-		{
-			tmp = add_char_to_str(final_string, str[i]);
-			i++;
-		}
-		final_string = tmp;
-		if (tmp)
-			free(tmp);
+		// inside_str_quotes = -1;
+		// if (str[i] == '\'')
+		// {
+		// 	single_quote++;
+		// 	inside_str_quotes = i;
+		// }
+		// else if (str[i] == '\"')
+		// {
+		// 	double_quote++;
+		// 	inside_str_quotes = i;
+		// }
+		// if (str[i] == '\'' || str[i] == '\"')
+		// 	i = inside_quote(str, i, str[i]);
+		// else
+		// {
+		// 	tmp = add_char_to_str(final_string, str[i]);
+		// 	i++;
+		// }
+		// final_string = tmp;
+		// if (tmp)
+		// 	free(tmp);
 	}
 	printf("final str = %s\n", final_string);
 	if (single_quote % 2 != 0 || double_quote % 2 != 0)
