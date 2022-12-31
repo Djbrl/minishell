@@ -61,28 +61,28 @@ void	expand_quotes(char *str)
 	// printf("%s\n", str_current);
 }
 
-void	free_str(char *str)
-{
-	int i = 0;
+// void	free_str(char *str)
+// {
+// 	int i = 0;
 
-	while (str[i])
-	{
-		free(str[i]);
-	}
-}
+// 	while (str[i])
+// 	{
+// 		free(str[i]);
+// 	}
+// }
 
-char	*add_char_to_str(char *str, char c)
-{
-	char *rt;
-	char char_to_add[2];
-	int size;
+// char	*add_char_to_str(char *str, char c)
+// {
+// 	char *rt;
+// 	char char_to_add[2];
+// 	int size;
 
-	size = ft_strlen(str) + 2;
-	char_to_add[0] = c;
-	char_to_add[1] = '\0';
-	rt = ft_strjoin(str, char_to_add);
-	return (rt);
-}
+// 	size = ft_strlen(str) + 2;
+// 	char_to_add[0] = c;
+// 	char_to_add[1] = '\0';
+// 	rt = ft_strjoin(str, char_to_add);
+// 	return (rt);
+// }
 
 int	check_quotes(char *str)
 {

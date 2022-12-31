@@ -77,10 +77,10 @@ void	exit_cmd(t_msh *msh)
 
 void	exit_shell(t_msh *msh)
 {
-	int		exit_status;
+	// int		exit_status;
 
-	exit_status = ft_atoi(get_data_from_env(msh->env, ft_strdup("?")));
+	// exit_status = ft_atoi(get_data_from_env(msh->env, ft_strdup("?")));
 	free_env(msh);
-	rl_clear_history();
-	exit(exit_status);
+	// rl_clear_history();
+	// exit(exit_status);
 }

@@ -171,14 +171,14 @@ static void	shell_loop(t_msh *msh)
 	}
 }
 
-int	main(int ac, char **av, char **envp)
-{
-	t_msh	msh;
+// int	main(int ac, char **av, char **envp)
+// {
+// 	t_msh	msh;
 
-	(void)ac;
-	(void)av;
-	init_env(&msh);
-	init_msh(&msh, envp);
-	shell_loop(&msh);
-	return (0);
-}
+// 	(void)ac;
+// 	(void)av;
+// 	init_env(&msh);
+// 	init_msh(&msh, envp);
+// 	shell_loop(&msh);
+// 	return (0);
+// }
