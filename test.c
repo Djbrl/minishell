@@ -29,7 +29,10 @@ int	dollar_case(char *str, char **rt, int i, t_msh *msh)
 			i++;
 	}
 	else
+	{
+
 		*rt = ft_strdup("$");
+	}
 	return (i);
 }
 
@@ -49,6 +52,50 @@ void	free_array(char **str)
 		free(str);
 }
 
+void	free_n_array(char **str, int n)
+{
+	int	i;
+
+	i = 0;
+	while (i < n)
+	{
+		if (str[i])
+			free(str[i]);
+		i++;
+	}
+}
+
+int	double_quote(char *str, char **rt, int i, t_msh *msh)
+{
+	int	k ;
+	char *tmp[2];
+
+	tmp[0] = ft_strdup("");
+	tmp[1] = ft_strdup("");
+	*rt = ft_strdup("");
+	while (str[i] == '\"' && str[i + 1])
+	{
+		i++;
+		k = i;
+		while (str[i] && str[i] != '\"')
+			i++;
+		if (str[i] && str[i] == '\"')
+			i++;
+		free(tmp[0]);
+		tmp[0] = malloc(sizeof(char) * i - k + 1); 
+		ft_strlcpy(tmp[0], &str[k], i - k);
+		free(tmp[1]);
+		tmp[1] = ft_strjoin(*rt, tmp[0]);
+		free(*rt);
+		*rt = ft_strdup(tmp[1]);
+	}
+	free(tmp[0]);
+	free(tmp[1]);
+	return i;
+}
+
+
+
 char	**expansion(char *str, t_msh *msh)
 {
 	int	i = 0;
@@ -67,8 +114,8 @@ char	**expansion(char *str, t_msh *msh)
 			while (str[i] && (str[i] != '\'' && str[i] != '"' && str[i] != ' '))				
 				i++;
 			rt[j] = malloc(sizeof(char) * i - k + 1); 
-			ft_strlcpy(rt[j], &str[k], i - k + 1);
-			j++;
+			ft_strlcpy(rt[j++], &str[k], i - k + 1);
+			// j++;
 		}
 		else if (str[i] == '\'')
 		{
@@ -80,27 +127,13 @@ char	**expansion(char *str, t_msh *msh)
 			if (str[i] && str[i] == '\'')
 				i++;
 			rt[j] = malloc(sizeof(char) * i - k + 1); 
-			ft_strlcpy(rt[j], &str[k], i - k);
-			j++;
+			ft_strlcpy(rt[j++], &str[k], i - k);
+			// j++;
 		}
 		else if (str[i] == '"')
-		{
-			i++;
-			k = i;
-			i++;
-			while (str[i] && str[i] != '\"')
-				i++;
-			if (str[i] && str[i] == '\"')
-				i++;
-			rt[j] = malloc(sizeof(char) * i - k + 1); 
-			ft_strlcpy(rt[j], &str[k], i - k);
-			j++;
-		}
+			i = double_quote(str, &rt[j++], i, msh);
 		else if (str[i] == '$')
-		{
-			i = dollar_case(str, &rt[j], i, msh);
-			j++;
-		}
+			i = dollar_case(str, &rt[j++], i, msh);
 		else if (str[i] && str[i] == ' ')
 		{
 			while (str[i] && str[i] == ' ')
@@ -120,15 +153,16 @@ int main(int ac, char *av[], char **envp)
 	(void)av;
 	init_env(&msh);
 	init_msh(&msh, envp);
-
+	char *prompt = "\"salut ca va\" bien ou 'koi'";
 	int i = 0;
-	tokens = expansion("echo $PATH", &msh);
-	printf("\n\n\n");
+	tokens = expansion(prompt, &msh);
+	printf("\n\nprompt = |%s|\n\n", prompt);
 	while (tokens[i])
 	{
 		printf("tokens[%d] = '%s'\n", i, tokens[i]);
 		i++;
 	}
+	printf("\n\n");
 	free_array(tokens);
 	exit_shell(&msh);
 	// if (msh.exp != NULL)
@@ -139,5 +173,5 @@ int main(int ac, char *av[], char **envp)
 	return (0);
 }
 
-//TODO : CHECK $ in double quotes
+//TODO : CHECK $ in double quotes + $"text"
 
