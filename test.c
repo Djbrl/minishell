@@ -1,5 +1,9 @@
 #include "include/minishell.h"
 
+// int	string(char *str, char *rt, int i, t_msh *msh);
+int	single_quote(char *str, char *rt, int i, t_msh *msh);
+
+
 char	*expand_env(char *str, t_msh *msh)
 {
 	int	i;
@@ -8,30 +12,30 @@ char	*expand_env(char *str, t_msh *msh)
 
 	i = 0;
 	rt = NULL;
-	while (str[i] && str[i] != ' ')
+	while (str[i] && str[i] != ' ' && str[i] != '"' && str[i] != '\'')
 		i++;
 	tmp = malloc(sizeof(char) * i + 1);
 	ft_strlcpy(tmp, str, i + 1);
-	printf("tmp = '%s'\n", tmp);
-	printf("$%s = '%s'\n", tmp, get_data_from_env(msh->env, tmp));
+	// printf("tmp = '%s'\n", tmp);
+	// printf("$%s = '%s'\n", tmp, get_data_from_env(msh->env, tmp));
 	rt = get_data_from_env(msh->env, tmp);
 	free(tmp);
 	return rt;
 }
 
-int	dollar_case(char *str, char **rt, int i, t_msh *msh)
+int	dollar_case(char *str, char *rt, int i, t_msh *msh)
 {
 	i++;
 	if (ft_isalpha(str[i]) || str[i] == '_')
 	{
-		*rt = ft_strdup(expand_env(&str[i], msh));
-		while (str[i] && str[i] != ' ')
+		rt = ft_strdup(expand_env(&str[i], msh));
+		while (str[i] && str[i] != ' ' && str[i] != '"' && str[i] != '\'')
 			i++;
 	}
 	else
 	{
 
-		*rt = ft_strdup("$");
+		rt = ft_strdup("$");
 	}
 	return (i);
 }
@@ -65,80 +69,139 @@ void	free_n_array(char **str, int n)
 	}
 }
 
-int	double_quote(char *str, char **rt, int i, t_msh *msh)
+int	double_quote(char *str, char *rt, int i, t_msh *msh)
 {
 	int	k ;
-	char *tmp[2];
+	char *tmp[3];
 
 	tmp[0] = ft_strdup("");
 	tmp[1] = ft_strdup("");
-	*rt = ft_strdup("");
+	tmp[2] = NULL;
+	if (!rt)
+		rt = ft_strdup("");
 	while (str[i] == '\"' && str[i + 1])
 	{
 		i++;
 		k = i;
 		while (str[i] && str[i] != '\"')
-			i++;
+		{
+			if (str[i] == '$')
+				i = dollar_case(str, tmp[2], i, msh);
+			else
+				i++;
+		}
+		if (tmp[2])
+			printf("tmp2 = '%s'\n", tmp[2]);
 		if (str[i] && str[i] == '\"')
 			i++;
 		free(tmp[0]);
 		tmp[0] = malloc(sizeof(char) * i - k + 1); 
 		ft_strlcpy(tmp[0], &str[k], i - k);
 		free(tmp[1]);
-		tmp[1] = ft_strjoin(*rt, tmp[0]);
-		free(*rt);
-		*rt = ft_strdup(tmp[1]);
+		tmp[1] = ft_strjoin(rt, tmp[0]);
+		free(rt);
+		rt = ft_strdup(tmp[1]);
+		// free(tmp[2]);
 	}
+	if (str[i] && str[i] == '\'')
+		i = single_quote(str, rt, i, msh);
+	// else if (str[i] && str[i])
 	free(tmp[0]);
 	free(tmp[1]);
+	free(tmp[2]);
 	return i;
 }
 
+int	single_quote(char *str, char *rt, int i, t_msh *msh)
+{
+	int	k ;
+	char *tmp[3];
 
+	tmp[0] = ft_strdup("");
+	tmp[1] = ft_strdup("");
+	if (!rt)
+		rt = ft_strdup("");
+	while (str[i] == '\'' && str[i + 1])
+	{
+		i++;
+		k = i;
+		while (str[i] && str[i] != '\'')
+			i++;
+		if (str[i] && str[i] == '\'')
+			i++;
+		free(tmp[0]);
+		tmp[0] = malloc(sizeof(char) * i - k + 1); 
+		ft_strlcpy(tmp[0], &str[k], i - k);
+		free(tmp[1]);
+		tmp[1] = ft_strjoin(rt, tmp[0]);
+		free(rt);
+		rt = ft_strdup(tmp[1]);
+	}
+	free(tmp[0]);
+	free(tmp[1]);
+	return (i);
+}
+
+int	string(char *str, char **rt, int i, t_msh *msh)
+{
+	int k;
+
+	k = 0;
+	if (str[i] != '\'' && str[i] != '"' && str[i] != ' ' && str[i] != '$')
+	{
+		k = i;
+		while (str[i] && (str[i] != '\'' && str[i] != '"' && str[i] != ' '))				
+			i++;
+		*rt = malloc(sizeof(char) * i - k + 1); 
+		ft_strlcpy(*rt, &str[k], i - k + 1);
+	}
+	return (i);
+}
+
+int		check_which_case(char *str, char **rt, int i, t_msh *msh)
+{
+	while(str[i] && str[i] != ' ')
+	{
+		if (str[i] != '\'' && str[i] != '"' && str[i] != ' ' && str[i] != '$')
+			i = string(str, rt, i, msh);
+		// else if (str[i] == '\'')
+		// 	i = single_quote(str, rt, i, msh);
+		// else if (str[i] == '"')
+		// 	i = double_quote(str, rt, i, msh);
+		// else if (str[i] == '$')
+		// 	i = dollar_case(str, rt, i, msh);
+		i++;
+	}
+	return (i);
+}
 
 char	**expansion(char *str, t_msh *msh)
 {
-	int	i = 0;
-	int	j = 0;
+	int	i;
+	int	j;
 	char	**rt;
-	char	*tmp;
 
+	i = 0;
+	j = 0;
 	rt = ft_calloc(200, sizeof(rt));
 	while (str[i])
 	{
-		int k = 0;
-		tmp = NULL;
-		if (str[i] != '\'' && str[i] != '"' && str[i] != ' ' && str[i] != '$')
-		{
-			k = i;
-			while (str[i] && (str[i] != '\'' && str[i] != '"' && str[i] != ' '))				
-				i++;
-			rt[j] = malloc(sizeof(char) * i - k + 1); 
-			ft_strlcpy(rt[j++], &str[k], i - k + 1);
-			// j++;
-		}
-		else if (str[i] == '\'')
-		{
+		i = check_which_case(str, &rt[j], i, msh);
+		j++;
+		while (str[i] && str[i] == ' ')
 			i++;
-			k = i;
-			i++;
-			while (str[i] && str[i] != '\'')
-				i++;
-			if (str[i] && str[i] == '\'')
-				i++;
-			rt[j] = malloc(sizeof(char) * i - k + 1); 
-			ft_strlcpy(rt[j++], &str[k], i - k);
-			// j++;
-		}
-		else if (str[i] == '"')
-			i = double_quote(str, &rt[j++], i, msh);
-		else if (str[i] == '$')
-			i = dollar_case(str, &rt[j++], i, msh);
-		else if (str[i] && str[i] == ' ')
-		{
-			while (str[i] && str[i] == ' ')
-				i++;
-		}
+		// if (str[i] != '\'' && str[i] != '"' && str[i] != ' ' && str[i] != '$')
+		// 	i = string(str, &rt[j++], i, msh);
+		// else if (str[i] == '\'')
+		// 	i = single_quote(str, &rt[j++], i, msh);
+		// else if (str[i] == '"')
+		// 	i = double_quote(str, &rt[j++], i, msh);
+		// else if (str[i] == '$')
+		// 	i = dollar_case(str, &rt[j++], i, msh);
+		// else if (str[i] && str[i] == ' ')
+		// 	while (str[i] && str[i] == ' ')
+
+		// i++;
 	}
 	rt[j] = 0;
 	return(rt);
@@ -153,7 +216,8 @@ int main(int ac, char *av[], char **envp)
 	(void)av;
 	init_env(&msh);
 	init_msh(&msh, envp);
-	char *prompt = "\"salut ca va\" bien ou 'koi'";
+	// char *prompt = "\"s\"\"a\"\"lut ca va\" bien ou 'k''o''i' echo \"BON$PATH\" \"l\"s \'sa\"lu\"t\' \"l\"\'s\'";
+	char *prompt = "phrase simple ";
 	int i = 0;
 	tokens = expansion(prompt, &msh);
 	printf("\n\nprompt = |%s|\n\n", prompt);
@@ -174,4 +238,6 @@ int main(int ac, char *av[], char **envp)
 }
 
 //TODO : CHECK $ in double quotes + $"text"
-
+//TODO : quand inside "" expand env
+//TODO : "l"'s' -> quand fin quote (double et single) si juste apres char ou "" ou '' strjoin
+//		 donc je pense int	double_quote(char *str, char **rt, int i, t_msh *msh + char *previous)
