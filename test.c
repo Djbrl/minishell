@@ -85,28 +85,47 @@ void	replace_rt(char **rt, char *tmp)
 		*rt = ft_strdup(tmp);
 }
 
+int	dollar_case_inside_dquote(char *str, char **rt, int i, t_msh *msh)
+{
+	if (ft_isalpha(str[i]) || str[i] == '_')
+	{
+		replace_rt(rt, expand_env(&str[i], msh));
+		while (str[i] && str[i] != ' ' && str[i] != '"' && str[i] != '\'')
+			i++;
+	}
+	else
+		replace_rt(rt, "$");
+	return (i);
+}
+
 int	double_quote(char *str, char **rt, int i, t_msh *msh)
 {
 	int	k ;
 	char *tmp;
 
-	tmp = ft_strdup("");
+	// tmp = ft_strdup("");
 	if (str[i] == '\"' && str[i + 1])
 	{
 		i++;
 		k = i;
-		while (str[i] && (str[i] != '\"' && str[i] != '$'))
+		while (str[i] && (str[i] != '\"'))
 		{
-			// if (str[i] == '$')
-			// 	i = dollar_case(str, tmp[2], i, msh);
-			// else
+			if (str[i] == '$')
+			{
+				i++;
+				tmp = malloc(sizeof(char) * i - k + 1);
+				ft_strlcpy(tmp, &str[k], i - k);
+				replace_rt(rt, tmp);
+				free(tmp);
+				i = dollar_case_inside_dquote(str, rt, i, msh);
+				k = i;
+			}
+			else
 				i++;
 		}
-		// if (tmp[2])
-		// 	printf("tmp2 = '%s'\n", tmp[2]);
 		if (str[i] && str[i] == '\"')
 			i++;
-		free(tmp);
+		// free(tmp);
 		tmp = malloc(sizeof(char) * i - k + 1); 
 		ft_strlcpy(tmp, &str[k], i - k);
 		replace_rt(rt, tmp);
@@ -203,9 +222,11 @@ int main(int ac, char *av[], char **envp)
 	(void)av;
 	init_env(&msh);
 	init_msh(&msh, envp);
-	// char *prompt = "\"s\"\"a\"\"lut ca va\" bien ou 'k''o''i' echo \"BON$PATH\" \"l\"s \'sa\"lu\"t\' \"l\"\'s\'   ";
+	char *prompt = "\"s\"\"a\"\"lut ca va\" \t bien ou 'k''o''i' echo \"BON$PATH\" \"l\"\'s\'sss \'sa\"lu\"t\' \"l\"\'s\'   ";
 	// char *prompt = "\"1\"\"2\"bonjour ca va";
-	char *prompt = "echo \"BON$PATH\"";
+	// char *prompt = "\"BON$ PATH \"";
+	// char *prompt = "echo $\"PATH\"";
+
 	int i = 0;
 	tokens = expansion(prompt, &msh);
 	printf("\n\nprompt = |%s|\n\n", prompt);
