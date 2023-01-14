@@ -149,13 +149,13 @@ int		pipe_exec(t_msh *msh);
 ** PARSING
 */
 char	**parse_prompt(char *str, t_msh *msh);
-void	replace_rt(char **rt, char *tmp);
+void	add_to_rt(char **rt, char *tmp);
 
-int		string_case(char *str, char **rt, int i, t_msh *msh);
-int		double_quote_case(char *str, char **rt, int i, t_msh *msh);
-int		single_quote_case(char *str, char **rt, int i, t_msh *msh);
-int		dollar_case(char *str, char **rt, int i, t_msh *msh);
-int		pipe_redir_case(char *str, char **rt, int i, t_msh *msh);
+int		string(char *str, char **rt, int i, t_msh *msh);
+int		double_quote(char *str, char **rt, int i, t_msh *msh);
+int		single_quote(char *str, char **rt, int i, t_msh *msh);
+int		dollar(char *str, char **rt, int i, t_msh *msh);
+int		pipe_redir(char *str, char **rt, int i, t_msh *msh);
 
 int		is_whitespace(char c);
 int		is_pipe_redir(char c);
