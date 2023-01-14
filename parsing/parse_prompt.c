@@ -12,40 +12,25 @@
 
 #include "minishell.h"
 
-void	replace_rt(char **rt, char *tmp)
-{
-	char	*rt_cpy;
-
-	if (*rt)
-	{
-		rt_cpy = ft_strdup(*rt);
-		free(*rt);
-		*rt = ft_strjoin(rt_cpy, tmp);
-		free(rt_cpy);
-	}
-	else
-		*rt = ft_strdup(tmp);
-}
-
 static int	check_which_case(char *str, char **rt, int i, t_msh *msh)
 {
 	while (str[i] && is_whitespace(str[i]))
 		i++;
 	if (is_pipe_redir(str[i]))
-		i = pipe_redir_case(str, rt, i, msh);
+		i = pipe_redir(str, rt, i, msh);
 	else
 	{
 		while (str[i] && !is_whitespace(str[i]) && !is_pipe_redir(str[i]))
 		{
 			if (str[i] != '\'' && str[i] != '"' && str[i] != '$'
 				&& !is_whitespace(str[i]))
-				i = string_case(str, rt, i, msh);
+				i = string(str, rt, i, msh);
 			else if (str[i] == '\'')
-				i = single_quote_case(str, rt, i, msh);
+				i = single_quote(str, rt, i, msh);
 			else if (str[i] == '"')
-				i = double_quote_case(str, rt, i, msh);
+				i = double_quote(str, rt, i, msh);
 			else if (str[i] == '$')
-				i = dollar_case(str, rt, i, msh);
+				i = dollar(str, rt, i, msh);
 		}
 	}
 	return (i);

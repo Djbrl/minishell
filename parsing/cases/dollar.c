@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   dollar_case.c                                      :+:      :+:    :+:   */
+/*   dollar.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jamrabhi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/12 21:40:25 by jamrabhi          #+#    #+#             */
-/*   Updated: 2023/01/12 21:40:26 by jamrabhi         ###   ########.fr       */
+/*   Created: 2023/01/14 22:17:23 by jamrabhi          #+#    #+#             */
+/*   Updated: 2023/01/14 22:17:27 by jamrabhi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,18 +30,18 @@ static char	*expand_env(char *str, t_msh *msh)
 	return (rt);
 }
 
-int	dollar_case(char *str, char **rt, int i, t_msh *msh)
+int	dollar(char *str, char **rt, int i, t_msh *msh)
 {
 	if (str[i] == '$')
 		i++;
 	if (ft_isalpha(str[i]) || str[i] == '_')
 	{
-		replace_rt(rt, expand_env(&str[i], msh));
+		add_to_rt(rt, expand_env(&str[i], msh));
 		while (str[i] && str[i] != '"' && str[i] != '\''
 			&& !is_whitespace(str[i]) && !is_pipe_redir(str[i]))
 			i++;
 	}
 	else
-		replace_rt(rt, "$");
+		add_to_rt(rt, "$");
 	return (i);
 }

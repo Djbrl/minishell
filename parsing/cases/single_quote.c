@@ -1,34 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   string_case.c                                      :+:      :+:    :+:   */
+/*   single_quote.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jamrabhi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/12 21:36:30 by jamrabhi          #+#    #+#             */
-/*   Updated: 2023/01/12 21:36:33 by jamrabhi         ###   ########.fr       */
+/*   Created: 2023/01/14 22:35:13 by jamrabhi          #+#    #+#             */
+/*   Updated: 2023/01/14 22:35:15 by jamrabhi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	string_case(char *str, char **rt, int i, t_msh *msh)
+int	single_quote(char *str, char **rt, int i, t_msh *msh)
 {
 	int		k;
-	char	*tmp1;
+	char	*tmp;
 
-	k = 0;
-	if (str[i] != '\'' && str[i] != '"' && !is_whitespace(str[i])
-		&& str[i] != '$' && !is_pipe_redir(str[i]))
+	tmp = ft_strdup("");
+	if (str[i] == '\'' && str[i + 1])
 	{
+		i++;
 		k = i;
-		while (str[i] && (str[i] != '\'' && str[i] != '"' && str[i] != '$'
-				&& !is_whitespace(str[i]) && !is_pipe_redir(str[i])))
+		while (str[i] && str[i] != '\'')
 			i++;
-		tmp1 = malloc(sizeof(char) * i - k + 1);
-		ft_strlcpy(tmp1, &str[k], i - k + 1);
+		if (str[i] && str[i] == '\'')
+			i++;
+		free(tmp);
+		tmp = malloc(sizeof(char) * i - k + 1);
+		ft_strlcpy(tmp, &str[k], i - k);
+		add_to_rt(rt, tmp);
 	}
-	replace_rt(rt, tmp1);
-	free(tmp1);
+	free(tmp);
 	return (i);
 }
