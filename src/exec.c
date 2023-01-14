@@ -6,58 +6,108 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/27 03:15:12 by dsy               #+#    #+#             */
-/*   Updated: 2022/10/13 12:24:06 by dsy              ###   ########.fr       */
+/*   Updated: 2023/01/10 16:28:21 by dsy              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	exec_env(t_msh *msh)
+static char	**check_redirections(t_msh *msh)
+{
+	int		in;
+	int		out;
+	char	**expr;
+	char	**tmp;
+
+	in = -1;
+	out = -1;
+	tmp = ft_split_charset(msh->prompt, "<>");
+	expr = ft_split(tmp[0], ' ');
+	apply_redirections(msh->prompt, &in, &out);
+	free_split(tmp);
+	if (in != -1)
+		dup2(in, 0);
+	if (out != -1)
+		dup2(out, 1);
+	return (expr);
+}
+
+static void	exec_path(t_msh *msh, char **expr)
 {
 	int		i;
 	char	*cmd;
 	char	*path;
-	int		status;
 
 	i = 0;
-	status = access(msh->tokens[0], X_OK & F_OK);
+	while (msh->paths[i])
+	{
+		if (access(msh->tokens[0], X_OK & F_OK) == 0)
+			execve(expr[0], expr, msh->envp);
+		cmd = ft_strjoin(msh->paths[i++], "/");
+		path = ft_strjoin(cmd, expr[0]);
+		if (access(path, X_OK & F_OK) == 0)
+			execve(path, expr, msh->envp);
+		free(cmd);
+		free(path);
+	}
+	display_cmd_error(expr[0], PATH_ERROR, expr);
+	exit(EXIT_FAILURE);
+}
+
+/*
+**	check if command can be executed, if not return -1
+**	else, execute command
+*/
+static int	exec_env(t_msh *msh)
+{
+	int		status;
+
 	if (!msh->paths)
 		return (-1);
-	if (msh->expr == NULL)
-	{
-		while (msh->paths[i])
-		{
-			if (status == 0)
-				execve(msh->tokens[0], msh->tokens, msh->envp);
-			cmd = ft_strjoin(msh->paths[i++], "/");
-			path = ft_strjoin(cmd, msh->tokens[0]);
-			execve(path, msh->tokens, msh->envp);
-			free(cmd);
-			free(path);
-		}
-	}
+	status = 0;
+	if (msh->exp == NULL || expr_len(msh->exp) == 1)
+		exec_path(msh, check_redirections(msh));
 	else
 		status = pipe_exec(msh);
 	return (status);
 }
 
-void	signal_handler(int sig_n)
+void	exec_builtin(t_msh *msh)
 {
-	if (sig_n == SIGINT)
+	int	in;
+	int	out;
+	int	saved_stdin;
+	int	saved_stdout;
+
+	in = -1;
+	out = -1;
+	saved_stdin = dup(0);
+	saved_stdout = dup(1);
+	apply_redirections(msh->prompt, &in, &out);
+	if (in != -1)
 	{
-		write(1, "\n", 1);
-		write(1, PROMPTLINE, ft_strlen(PROMPTLINE));
+		dup2(in, 0);
+		close(in);
 	}
-	else
-		return ;
+	if (out != -1)
+	{
+		dup2(out, 1);
+		close(out);
+	}
+	printf("executing builtin [%s]\n", msh->tokens[0]);
+	msh->cmd.ptr[is_builtin(msh->tokens[0], msh)](msh->env, msh);
+	dup2(saved_stdin, 0);
+	dup2(saved_stdout, 1);
+	close(saved_stdin);
+	close(saved_stdout);
 }
 
 void	evaluate_commands(t_msh *msh)
 {
 	pid_t	pid;
 
-	if (is_builtin(msh->tokens[0], msh) >= 0)
-		msh->cmd.ptr[is_builtin(msh->tokens[0], msh)](msh->env, msh);
+	if (is_builtin(msh->tokens[0], msh) >= 0 && expr_len(msh->exp) == 1)
+		exec_builtin(msh);
 	else
 	{
 		pid = fork();

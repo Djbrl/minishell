@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/27 03:10:39 by dsy               #+#    #+#             */
-/*   Updated: 2022/10/13 12:25:05 by dsy              ###   ########.fr       */
+/*   Updated: 2023/01/10 16:28:33 by dsy              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,9 @@ void	init_msh(t_msh *msh, char **envp)
 		msh->envp = NULL;
 	msh->envp = envp;
 	msh->paths = NULL;
-	msh->expr = NULL;
+	msh->exp = NULL;
 	msh->home = NULL;
 	msh->user = NULL;
-	msh->expr = NULL;
 	msh->default_path = NULL;
 	msh->full_path = NULL;
 	msh->exit_status = 0;
@@ -52,14 +51,15 @@ void	init_msh(t_msh *msh, char **envp)
 	parse_envp(msh);
 }
 
-// void	init_expr(t_msh *msh)
-// {
-// 	msh->expr = (malloc(sizeof(t_expr)));
-// 	msh->expr->data = ft_strdup("init");
-// 	msh->expr->next = NULL;
-// 	msh->expr->fd_in = -1;
-// 	msh->expr->fd_out = -1;
-// }
+void	init_expr(t_msh *msh)
+{
+	msh->exp = (malloc(sizeof(t_expr)));
+	msh->exp->data = ft_strdup("init");
+	msh->exp->next = NULL;
+	msh->exp->fd_in = -1;
+	msh->exp->fd_out = -1;
+	msh->exp->redir = -1;
+}
 
 void	init_env(t_msh *msh)
 {

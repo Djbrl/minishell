@@ -6,7 +6,7 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/14 16:15:31 by dsy               #+#    #+#             */
-/*   Updated: 2020/12/07 18:10:42 by user42           ###   ########.fr       */
+/*   Updated: 2023/01/10 16:26:41 by dsy              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,16 +42,18 @@
 # define STATUS_RESET 0
 # define CTRL_C_EXIT 2
 # define CTRL_D_SIGNAL 0
+# define BUFFER_SIZE 1
 
 extern int				g_status;
 typedef struct s_msh	t_msh;
 
-// typedef struct s_expr{
-// 	char			*data;
-// 	int				fd_in;
-// 	int				fd_out;
-// 	struct s_expr	*next;
-// }					t_expr;
+typedef struct s_expr{
+	char			*data;
+	int				fd_in;
+	int				fd_out;
+	int				redir;
+	struct s_expr	*next;
+}					t_expr;
 
 typedef struct s_env_var
 {
@@ -69,6 +71,7 @@ typedef struct s_cmd
 typedef struct s_msh
 {
 	t_cmd		cmd;
+	t_expr		*exp;
 	t_env_var	*env;
 	char		*home;
 	char		*user;
@@ -77,7 +80,6 @@ typedef struct s_msh
 	char		*prompt;
 	char		**tokens;
 	char		**envp;
-	char		**expr;
 	char		**paths;
 	char		g_buffer[BUF];
 	int			nb_tokens;
@@ -89,7 +91,7 @@ typedef struct s_msh
 */
 void	init_env(t_msh *msh);
 void	init_msh(t_msh *msh, char **envp);
-// void	init_expr(t_msh *msh);
+void	init_expr(t_msh *msh);
 
 /*
 ** BUILTINS
@@ -129,39 +131,44 @@ void	exit_shell(t_msh *msh);
 /*
 ** UTILS
 */
+int		expr_len(t_expr *expr);
 int		load_expr(t_msh *msh);
-void	free_expr(t_msh *msh);
+void	free_expr(t_msh **msh);
 char	*expand_var(t_msh *msh, char *var);
 void	free_split(char **array);
 void	flush_buffer(t_msh *msh);
+int		get_next_line(int fd, char **line);
 int		update_exit_status(t_msh *msh, int status);
 int		is_builtin(char *s, t_msh *msh);
-int		check_quotes(char *str);
-char	**ft_split_str(char const *s, const char *delimiters);
-
+char	**ft_split_charset(const char *s, const char *set);
+char	*remove_spaces(const char *str);
 
 /*
 ** PIPE
 */
 int		pipe_exec(t_msh *msh);
+int		init_fds(t_expr **commands, t_expr *prev);
+void	close_fds(t_expr **curr_command);
+int		connect_fds(t_expr **curr_command, t_expr *commands);
+
+/*
+** REDIRECTIONS
+*/
+void	exec_builtin(t_msh *msh);
+void	apply_redirections(char *expr, int *fd_in, int *fd_out);
 
 /*
 ** PARSING
 */
 char	**parse_prompt(char *str, t_msh *msh);
 void	add_to_rt(char **rt, char *tmp);
-
-int		string(char *str, char **rt, int i, t_msh *msh);
-int		double_quote(char *str, char **rt, int i, t_msh *msh);
-int		single_quote(char *str, char **rt, int i, t_msh *msh);
-int		dollar(char *str, char **rt, int i, t_msh *msh);
-int		pipe_redir(char *str, char **rt, int i, t_msh *msh);
-
-int		is_whitespace(char c);
-int		is_pipe_redir(char c);
 void	*ft_realloc(void *ptr, size_t cursize, size_t newsize);
-
-
-
+int		is_pipe_redir(char c);
+int		is_whitespace(char c);
+int		dollar(char *str, char **rt, int i, t_msh *msh);
+int		double_quote(char *str, char **rt, int i, t_msh *msh);
+int		pipe_redir(char *str, char **rt, int i);
+int		single_quote(char *str, char **rt, int i);
+int		string(char *str, char **rt, int i);
 
 #endif

@@ -1,41 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   read_expand_builtin.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/25 11:17:24 by dsy               #+#    #+#             */
-/*   Updated: 2020/12/07 17:48:10 by user42           ###   ########.fr       */
+/*   Updated: 2023/01/10 16:29:53 by dsy              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-char	*get_currentdir(t_msh *msh)
-{
-	char	*path;
-	char	cwd[1024];
-	int		i;
-	int		last_slash;
-
-	i = 0;
-	last_slash = 0;
-	path = ft_strdup(getcwd(cwd, sizeof(cwd)));
-	if (!path)
-	{
-		display_error(CWD_ERROR, msh);
-		return (NULL);
-	}
-	while (path[i])
-	{
-		if (path[i] == '/')
-			last_slash = i;
-		i++;
-	}
-	free(path);
-	return (ft_strdup(path + last_slash + 1));
-}
 
 /*
 ** The 'ft_strlen() + 1' is meant to check if there 

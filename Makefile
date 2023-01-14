@@ -6,7 +6,7 @@
 #    By: dsy <marvin@42.fr>                         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/10/13 16:01:25 by dsy               #+#    #+#              #
-#    Updated: 2022/10/14 18:28:00 by dsy              ###   ########.fr        #
+#    Updated: 2023/01/10 16:26:53 by dsy              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,15 +20,29 @@ NAME := minishell
 LIB_FT := libft/libft.a
 
 CC := cc
-CFLAGS := #-Wall -Wextra -Werror
+CFLAGS := -Wall -Wextra -Werror
 CPFLAGS := -g3#-lreadline
 PFLAGS := -Iinclude -Ilibft
 
-SRC_OTHER := main.c display.c exec.c utils/utils.c builtins/builtins_1.c \
-			 init.c builtins/builtins_2.c builtins/builtins_runner.c \
-			 utils/list_utils.c free.c envp.c expr.c utils/expr_utils.c \
-			 builtins/ftn_builtins.c utils/ftn_utils.c pipex/pipe.c\
-			 utils/check_quotes.c utils/ft_split_str.c\
+SRC_OTHER := main.c exec.c init.c envp.c expr.c\
+			 \
+			 utils/list.c utils/status_signal_expr.c utils/free_exit.c \
+			 utils/split_charset.c utils/read_expand_builtin.c \
+			 utils/get_next_line.c utils/display.c \
+			 \
+			 pipes/pipe.c pipes/pipe_utils.c \
+			 \
+			 redirections/redirections.c redirections/redirections_utils.c \
+			 \
+			 builtins/echo_runner.c builtins/export_runner.c \
+			 builtins/other.c builtins/export.c builtins/unset.c \
+			 builtins/echo.c builtins/cd.c \
+			 \
+			 parsing/parse_prompt.c parsing/cases/dollar.c \
+			 parsing/cases/double_quote.c parsing/cases/single_quote.c \
+			 parsing/cases/pipe_redir.c parsing/cases/string.c \
+			 parsing/utils/add_to_rt.c parsing/utils/ft_realloc.c \
+			 parsing/utils/is_pipe_redir.c parsing/utils/is_whitespace.c \
 
 SRC_PATH := src
 SRC_NAME := $(SRC_OTHER)

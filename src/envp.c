@@ -6,7 +6,7 @@
 /*   By: dsy <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/20 16:11:20 by dsy               #+#    #+#             */
-/*   Updated: 2022/09/20 16:11:23 by dsy              ###   ########.fr       */
+/*   Updated: 2023/01/10 16:28:17 by dsy              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void	parse_envp(t_msh *msh)
 		if (!var)
 			return ;
 		data = ft_substr(msh->envp[i], find_char(msh->envp[i], '=') + 1 \
-			, find_char(msh->envp[i], '0'));
+			, find_char(msh->envp[i], '\0'));
 		add_var_to_env(msh->env, var, data);
 		if (ft_strncmp(var, "PATH", ft_strlen(var)) == 0)
 			parse_paths(data, msh);

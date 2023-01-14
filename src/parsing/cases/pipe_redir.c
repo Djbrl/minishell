@@ -1,23 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftn_utils.c                                        :+:      :+:    :+:   */
+/*   pipe_redir.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dsy <marvin@42.fr>                         +#+  +:+       +#+        */
+/*   By: jamrabhi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/10/14 18:26:08 by dsy               #+#    #+#             */
-/*   Updated: 2022/10/14 18:26:39 by dsy              ###   ########.fr       */
+/*   Created: 2023/01/14 22:35:02 by jamrabhi          #+#    #+#             */
+/*   Updated: 2023/01/14 22:35:04 by jamrabhi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	update_exit_status(t_msh *msh, int status)
+int	pipe_redir(char *str, char **rt, int i)
 {
+	int		k;
 	char	*tmp;
 
-	tmp = ft_itoa(status);
-	add_var_to_env(msh->env, "?", tmp);
-	free(tmp);
-	return (status);
+	k = i;
+	while (str[i] && str[i] == str[k])
+		i++;
+	tmp = malloc(sizeof(char) * i - k + 1);
+	ft_strlcpy(tmp, &str[k], i - k + 1);
+	add_to_rt(rt, tmp);
+	if (tmp)
+		free(tmp);
+	return (i);
 }

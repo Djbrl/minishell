@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free.c                                             :+:      :+:    :+:   */
+/*   free_exit.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dsy <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:26:32 by dsy               #+#    #+#             */
-/*   Updated: 2022/09/15 14:26:34 by dsy              ###   ########.fr       */
+/*   Updated: 2023/01/10 16:29:31 by dsy              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,17 @@ void	exit_cmd(t_msh *msh)
 
 void	exit_shell(t_msh *msh)
 {
-	// int		exit_status;
+	int		exit_status;
 
-	// exit_status = ft_atoi(get_data_from_env(msh->env, ft_strdup("?")));
+	exit_status = ft_atoi(get_data_from_env(msh->env, ft_strdup("?")));
 	free_env(msh);
-	// rl_clear_history();
-	// exit(exit_status);
+	if (msh->exp != NULL)
+	{
+		free(msh->exp->data);
+		free(msh->exp);
+	}
+	exit(exit_status);
 }
+/**
+** clear_history();
+**/
