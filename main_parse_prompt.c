@@ -25,18 +25,18 @@ int	main(int ac, char *av[], char **envp)
 	(void)av;
 	init_env(&msh);
 	init_msh(&msh, envp);
-	char *prompt = "\"s\"\"a\"\"lut ca va\" \v bien ou 'k''o''i' |echo \"BON$PATH\" <>\"l\"\'s\'sss \'sa\"lu\"t\' \"l\"\'s\'  $\"PATH\" ";
+	char *prompt = "\"s\"\"a\"\"\101lut ca va\" \v bien ou 'k''o''i' |echo \"BON$PATH\" <>\"l\"\'s\'sss \'sa\"lu\"t\' \"l\"\'s\'  $\"PATH\" ";
 	// char *prompt = "\"1\"\"2\"bonjour ca va";
 	// char *prompt = "\"BON$ PATH \"";
 	// char *prompt = "echo $\"PATH\"";
-	// char *prompt = "bonjour";
-	// char *prompt = " bonjour";
+	// char *prompt = " saltu \'bonjour";
+	// char *prompt = "\"l\"s";
 	// char *prompt = "echo bonjour>rt || ls>><rt";
 	// char *prompt = NULL;
 
 	int i = 0;
 	tokens = parse_prompt(prompt, &msh);
-	printf("\n\nprompt = |%s|\n\n", prompt);
+	printf("\n\nPrompt = [%s]\n\n", prompt);
 	while (tokens && tokens[i])
 	{
 		printf("tokens[%d] = '%s'\n", i, tokens[i]);

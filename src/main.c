@@ -65,7 +65,7 @@ static void	shell_loop(t_msh *msh)
 			&& !only_whitespaces(msh->prompt))
 		{
 			free_exp = load_expr(msh);
-			msh->tokens = parse_prompt(msh->prompt, msh);
+			// msh->tokens = parse_prompt(msh->prompt, msh);
 			msh->nb_tokens = get_nb_tokens(msh->tokens);
 			evaluate_commands(msh);
 			clean_expr(msh, free_exp);
@@ -77,15 +77,15 @@ static void	shell_loop(t_msh *msh)
 	}
 }
 
-int	main(int ac, char **av, char **envp)
-{
-	t_msh	msh;
+// int	main(int ac, char **av, char **envp)
+// {
+// 	t_msh	msh;
 
-	(void)ac;
-	(void)av;
-	init_env(&msh);
-	init_msh(&msh, envp);
-	init_expr(&msh);
-	shell_loop(&msh);
-	return (0);
-}
+// 	(void)ac;
+// 	(void)av;
+// 	init_env(&msh);
+// 	init_msh(&msh, envp);
+// 	init_expr(&msh);
+// 	shell_loop(&msh);
+// 	return (0);
+// }

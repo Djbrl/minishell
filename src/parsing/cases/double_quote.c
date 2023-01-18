@@ -44,8 +44,8 @@ int	double_quote(char *str, char **rt, int i, t_msh *msh)
 			else
 				i++;
 		}
-		if (str[i] && str[i] == '\"')
-			i++;
+		if (!str[i] || str[i++] != '\"')
+			return (-1);
 		tmp = malloc(sizeof(char) * i - k + 1);
 		ft_strlcpy(tmp, &str[k], i - k);
 		add_to_rt(rt, tmp);

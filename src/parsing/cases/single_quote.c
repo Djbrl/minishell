@@ -23,8 +23,9 @@ int	single_quote(char *str, char **rt, int i)
 		k = i;
 		while (str[i] && str[i] != '\'')
 			i++;
-		if (str[i] && str[i] == '\'')
-			i++;
+		if (!str[i] || str[i] != '\'')
+			return (-1);
+		i++;
 		tmp = malloc(sizeof(char) * i - k + 1);
 		ft_strlcpy(tmp, &str[k], i - k);
 		add_to_rt(rt, tmp);
