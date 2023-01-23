@@ -1,43 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   single_quote.c                                     :+:      :+:    :+:   */
+/*   pipe_redir_inside_quotes.c                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jamrabhi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/14 22:35:13 by jamrabhi          #+#    #+#             */
-/*   Updated: 2023/01/14 22:35:15 by jamrabhi         ###   ########.fr       */
+/*   Created: 2023/01/23 23:11:20 by jamrabhi          #+#    #+#             */
+/*   Updated: 2023/01/23 23:11:23 by jamrabhi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	single_quote(char *str, char **rt, int i)
+int	pipe_redir_inside_quotes(char *str, char **rt, int i)
 {
-	int		k;
 	char	*tmp;
 
-	if (str[i] == '\'' && str[i + 1])
-	{
-		i++;
-		k = i;
-		while (str[i] && str[i] != '\'')
-		{
-			if (is_pipe_redir(str[i]))
-			{
-				i = k + pipe_redir_inside_quotes(&str[k], rt, i - k);
-				k = i;
-			}
-			else
-				i++;
-		}
-		if (!str[i] || str[i] != '\'')
-			return (-1);
-		i++;
-		tmp = malloc(sizeof(char) * i - k);
-		ft_strlcpy(tmp, &str[k], i - k);
-		add_to_rt(rt, tmp);
-		free(tmp);
-	}
+	i++;
+	tmp = malloc(sizeof(char) * (i + 2));
+	ft_strlcpy(tmp, str, i + 1);
+	tmp[i] = 6;
+	tmp[i + 1] = '\0';
+	add_to_rt(rt, tmp);
+	free(tmp);
 	return (i);
 }

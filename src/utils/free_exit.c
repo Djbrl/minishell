@@ -79,7 +79,7 @@ void	exit_shell(t_msh *msh)
 {
 	int		exit_status;
 
-	exit_status = 1;
+	exit_status = 0;
 	free_env(msh);
 	if (msh->exp != NULL)
 	{
