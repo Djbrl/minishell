@@ -31,9 +31,8 @@ int	single_quote(char *str, char **rt, int i)
 			else
 				i++;
 		}
-		if (!str[i] || str[i] != '\'')
+		if (!str[i] || str[i++] != '\'')
 			return (-1);
-		i++;
 		tmp = malloc(sizeof(char) * i - k);
 		ft_strlcpy(tmp, &str[k], i - k);
 		add_to_rt(rt, tmp);
