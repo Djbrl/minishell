@@ -70,11 +70,9 @@ char	**parse_prompt(char *str, t_msh *msh)
 	rt = malloc(sizeof(rt));
 	if (!rt)
 		return (NULL);
-	rt[j] = ft_strdup("");
 	while (i != -1 && str[i])
 	{
-		if (j > 0)
-			rt[j] = NULL;
+		rt[j] = 0;
 		i = check_which_case(str, &rt[j++], i, msh);
 		rt = ft_realloc(rt, j * sizeof(rt), (j + 1) * sizeof(rt));
 		if (!rt)

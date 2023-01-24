@@ -34,7 +34,7 @@ int	main(int ac, char *av[], char **envp)
 	// char *prompt = "echo bonjour>rt || ls>><rt";
 	// char *prompt = NULL;
 	// char *prompt = "\"ls > rt\"";
-	char *prompt = "echo \"\" \'\'";
+	char *prompt = "   ";
 
 
 	int i = 0;
