@@ -39,26 +39,23 @@ int	double_quote(char *str, char **rt, int i, t_msh *msh)
 	int		k;
 	char	*tmp;
 
-	if (str[i] == '\"' && str[i + 1])
+	i++;
+	k = i;
+	while (str[i] && (str[i] != '\"'))
 	{
-		i++;
-		k = i;
-		while (str[i] && (str[i] != '\"'))
+		if (str[i] == '$' || is_pipe_redir(str[i]))
 		{
-			if (str[i] == '$' || is_pipe_redir(str[i]))
-			{
-				i = k + special_cases_dquote(&str[k], rt, i - k, msh);
-				k = i;
-			}
-			else
-				i++;
+			i = k + special_cases_dquote(&str[k], rt, i - k, msh);
+			k = i;
 		}
-		if (!str[i] || str[i++] != '\"')
-			return (-1);
-		tmp = malloc(sizeof(char) * i - k);
-		ft_strlcpy(tmp, &str[k], i - k);
-		add_to_rt(rt, tmp);
-		free(tmp);
+		else
+			i++;
 	}
+	if (!str[i] || str[i++] != '\"')
+		return (-1);
+	tmp = malloc(sizeof(char) * i - k);
+	ft_strlcpy(tmp, &str[k], i - k);
+	add_to_rt(rt, tmp);
+	free(tmp);
 	return (i);
 }

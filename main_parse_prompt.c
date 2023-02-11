@@ -25,16 +25,22 @@ int	main(int ac, char *av[], char **envp)
 	(void)av;
 	init_env(&msh);
 	init_msh(&msh, envp);
-	// char *prompt = "\"s\"\"a\"\"\101lut ca va\" \v bien ou 'k''o''i' |echo \"BON$PATH\" <>\"l\"\'s\'sss \'sa\"lu\"t\' \"l\"\'s\'  $\"PATH\" \"redir >> dquotes\" \'pipe | squote\'";
+	// char *prompt = "export a=\"s -la\"";
+	// char *prompt = "\"s\"\"a\"\"\101lut ca va\" \v bien ou 'k''o''i' |echo \"BON$PATH\" <>\"l\"\'s\'sss \'sa\"lu\"t\' \"l\"\'s\'  $a\"PATH\" \"redir >> dquotes\" \'pipe | squote\'";
 	// char *prompt = "\"1\"\"2\"bonjour ca va";
 	// char *prompt = "\"BON$ PATH \"";
 	// char *prompt = "echo $\"PATH\"";
+	// char *prompt = "$\"PATH\"";
 	// char *prompt = " saltu \'bonjour";
 	// char *prompt = "\"l\"s";
 	// char *prompt = "echo bonjour>rt || ls>><rt";
 	// char *prompt = NULL;
 	// char *prompt = "\"ls > rt\"";
-	char *prompt = "   ";
+	// char *prompt = "echo \"$PAT\" salut ";
+	// char *prompt = "echo \"bon>ls\" ";
+	// char *prompt = "salut \"";
+	// char *prompt = "echo $asda\"PATH\"";
+	char *prompt = "echo \"bonjo\"ur\"";
 
 
 	int i = 0;
