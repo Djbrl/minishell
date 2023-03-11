@@ -6,7 +6,7 @@
 #    By: dsy <marvin@42.fr>                         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/10/13 16:01:25 by dsy               #+#    #+#              #
-#    Updated: 2023/01/10 16:26:53 by dsy              ###   ########.fr        #
+#    Updated: 2023/02/23 12:28:07 by dsy              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,22 +27,27 @@ PFLAGS := -Iinclude -Ilibft
 SRC_OTHER := main.c exec.c init.c envp.c expr.c\
 			 \
 			 utils/list.c utils/status_signal_expr.c utils/free_exit.c \
-			 utils/split_charset.c utils/read_expand_builtin.c \
-			 utils/get_next_line.c utils/display.c \
+			 utils/split_charset.c utils/read_expand_builtin.c utils/sort_env.c\
+			 utils/get_next_line.c utils/display.c utils/exit_shell.c \
+			 utils/promptline.c utils/read_parsing.c utils/set_prompt.c \
+			 utils/single_exec_utils.c \
 			 \
-			 pipes/pipe.c pipes/pipe_utils.c \
+			 pipes/pipe.c pipes/pipe_utils.c pipes/pipe_child.c pipes/pipe_exec.c \
 			 \
 			 redirections/redirections.c redirections/redirections_utils.c \
+			 redirections/check_redirections.c redirections/child_heredoc.c \
+			 redirections/redir_handlers.c redirections/heredoc_expand.c \
 			 \
 			 builtins/echo_runner.c builtins/export_runner.c \
 			 builtins/other.c builtins/export.c builtins/unset.c \
-			 builtins/echo.c builtins/cd.c \
+			 builtins/echo.c builtins/cd.c builtins/cd_extension.c \
 			 \
 			 parsing/parse_prompt.c parsing/cases/dollar.c \
 			 parsing/cases/double_quote.c parsing/cases/single_quote.c \
 			 parsing/cases/pipe_redir.c parsing/cases/string.c \
 			 parsing/utils/add_to_rt.c parsing/utils/ft_realloc.c \
 			 parsing/utils/is_pipe_redir.c parsing/utils/is_whitespace.c \
+			 parsing/utils/pipe_redir_inside_quotes.c parsing/expand_prompt.c \
 
 SRC_PATH := src
 SRC_NAME := $(SRC_OTHER)
@@ -81,7 +86,7 @@ libft_fclean:
 
 lib_clean: libft_clean 
 
-lib_fclean: libft_clean 
+lib_fclean: libft_fclean 
 
 re: fclean all
 

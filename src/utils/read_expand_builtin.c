@@ -6,16 +6,26 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/25 11:17:24 by dsy               #+#    #+#             */
-/*   Updated: 2023/01/10 16:29:53 by dsy              ###   ########.fr       */
+/*   Updated: 2023/02/15 17:26:34 by dsy              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/*
-** The 'ft_strlen() + 1' is meant to check if there 
-** are any extra characters after the builtin name string
-*/
+int	is_redir(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '>' || str[i] == '<')
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
 int	is_builtin(char *s, t_msh *msh)
 {
 	int	i;
@@ -30,74 +40,57 @@ int	is_builtin(char *s, t_msh *msh)
 	return (-1);
 }
 
-char	*expand_var(t_msh *msh, char *var)
+static void	check_prompt(t_msh *msh, char *s)
 {
-	char	*ret;
-	char	*find;
+	int	i;
 
-	find = ft_substr(var, 1, ft_strlen(var) - 1);
-	ret = get_data_from_env(msh->env, find);
-	if (ret == NULL)
-		return (ft_strdup(var));
+	i = -1;
+	if (ft_strlen(s) != 0)
+		add_history(s);
+	if (has_odd_quotes(s) || has_unexpected_token(s))
+	{
+		printf(SYNTAX_ERR_QUOTES);
+		ft_memset(msh->g_buffer, 0, BUF);
+		return ;
+	}
+	if (ft_strlen(s) == 0)
+		ft_memset(msh->g_buffer, 0, BUF);
 	else
-		return (ft_strdup(ret));
+	{
+		while (s[++i] && s[i] != '\n')
+			msh->g_buffer[i] = s[i];
+	}
 }
 
-void	flush_buffer(t_msh *msh)
+static void	exit_failure(t_msh *msh)
 {
+	(void)msh;
 	ft_memset(msh->g_buffer, 0, BUF);
+	free_env(msh);
+	free_expr(&msh);
+	exit(EXIT_SUCCESS);
 }
 
 void	read_buffer(t_msh *msh)
 {
-	int	signal;
+	char	*s;
+	char	*user;
+	char	*promptline;
 
-	flush_buffer(msh);
-	if (g_status == CTRL_C_EXIT)
-		g_status = STATUS_RESET;
+	dup2(msh->std_in, 0);
+	user = ft_strdup(get_data_from_env(msh->env, ft_strdup("USER")));
+	promptline = NULL;
+	build_promptline(user, &promptline, msh);
+	s = readline(promptline);
+	free(promptline);
+	if (s != NULL)
+		check_prompt(msh, s);
 	else
-		display_prompt(MODE_DEFAULT, msh);
-	signal = read(0, msh->g_buffer, BUF);
-	if (signal == CTRL_D_SIGNAL)
+		exit_failure(msh);
+	if (g_status == CTRL_D_SIGNAL)
 	{
-		flush_buffer(msh);
-		exit_cmd(msh);
-		exit_shell(msh);
+		ft_memset(msh->g_buffer, 0, BUF);
+		g_status = 0;
 	}
-	msh->g_buffer[ft_strlen(msh->g_buffer) - 1] = 0;
+	free(s);
 }
-
-// void	read_buffer(t_msh *msh)
-// {
-// 	// int	signal;
-// 	char	*s;
-// 	int		i;
-
-// 	i = 0;
-// 	s = readline(PROMPTLINE);
-// 	if (s != NULL)
-// 	{
-// 		add_history(s);
-// 		if (ft_strlen(s) == 0)
-// 		{
-// 		//	write(1, "\n", 1);
-// 			return ;
-// 		}
-// 		else
-// 		{
-// 			while (s[i] && s[i] != '\n')
-// 			{
-// 				msh->g_buffer[i] = s[i];
-// 				i++;
-// 			}
-// 		}
-// 	}
-// 	else
-// 	{
-// 		flush_buffer(msh);
-// 		exit_cmd(msh);
-// 		exit_shell(SUCCESS, msh);
-// 		return ;
-// 	}
-// 	free(s);
-// }

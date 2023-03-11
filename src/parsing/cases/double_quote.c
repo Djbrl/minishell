@@ -12,29 +12,7 @@
 
 #include "minishell.h"
 
-static int	dollar_inside_dquote(char *str, char **rt, int i, t_msh *msh)
-{
-	char	*tmp;
-
-	i++;
-	tmp = malloc(sizeof(char) * i);
-	ft_strlcpy(tmp, str, i);
-	add_to_rt(rt, tmp);
-	free(tmp);
-	i = dollar(str, rt, i, msh);
-	return (i);
-}
-
-static int	special_cases_dquote(char *str, char **rt, int i, t_msh *msh)
-{
-	if (str[i] && str[i] == '$')
-		i = dollar_inside_dquote(str, rt, i, msh);
-	else if (str[i] && is_pipe_redir(str[i]))
-		i = pipe_redir_inside_quotes(str, rt, i);
-	return (i);
-}
-
-int	double_quote(char *str, char **rt, int i, t_msh *msh)
+int	double_quote(char *str, char **rt, int i)
 {
 	int		k;
 	char	*tmp;
@@ -43,9 +21,9 @@ int	double_quote(char *str, char **rt, int i, t_msh *msh)
 	k = i;
 	while (str[i] && (str[i] != '\"'))
 	{
-		if (str[i] == '$' || is_pipe_redir(str[i]))
+		if (is_pipe_redir(str[i]))
 		{
-			i = k + special_cases_dquote(&str[k], rt, i - k, msh);
+			i = k + pipe_redir_inside_quotes(&str[k], rt, i - k);
 			k = i;
 		}
 		else

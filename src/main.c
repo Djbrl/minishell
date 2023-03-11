@@ -19,24 +19,9 @@ static int	get_nb_tokens(char **tokens)
 	int	i;
 
 	i = 0;
-	while (tokens[i] != NULL)
+	while (tokens && tokens[i] != NULL)
 		i++;
 	return (i);
-}
-
-static int	only_whitespaces(char *buf)
-{
-	int	i;
-
-	i = 0;
-	while (buf[i])
-	{
-		if (buf[i] != ' ' && buf[i] != '\t' && \
-			buf[i] != '\v' && buf[i] != '\n')
-			return (0);
-		i++;
-	}
-	return (1);
 }
 
 static void	clean_expr(t_msh *msh, int free_flag)
@@ -49,43 +34,45 @@ static void	clean_expr(t_msh *msh, int free_flag)
 	return ;
 }
 
-static void	shell_loop(t_msh *msh)
+static void	launch_command(t_msh *msh)
 {
 	int	free_exp;
 
-	signal(SIGINT, signal_handler);
-	signal(SIGQUIT, signal_handler);
+	free_exp = load_expr(msh);
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
+	if (msh->nb_tokens > 0)
+		evaluate_commands(msh);
+	clean_expr(msh, free_exp);
+	exit_cmd(msh);
+	ft_memset(msh->g_buffer, 0, BUF);
+}
+
+static void	shell_loop(t_msh *msh)
+{
 	update_exit_status(msh, 0);
 	while (RUNNING)
 	{
-		free_exp = 0;
-		read_buffer(msh);
-		msh->prompt = ft_strdup(msh->g_buffer);
-		if (msh->prompt != NULL && ft_strlen(msh->prompt) != 0 \
-			&& !only_whitespaces(msh->prompt))
+		if (set_prompt(msh))
 		{
-			free_exp = load_expr(msh);
-			// msh->tokens = parse_prompt(msh->prompt, msh);
+			msh->tokens = parse_prompt(msh->prompt, msh);
 			msh->nb_tokens = get_nb_tokens(msh->tokens);
-			evaluate_commands(msh);
-			clean_expr(msh, free_exp);
-			exit_cmd(msh);
-			flush_buffer(msh);
+			launch_command(msh);
 		}
 		else
 			free(msh->prompt);
 	}
 }
 
-// int	main(int ac, char **av, char **envp)
-// {
-// 	t_msh	msh;
+int	main(int ac, char **av, char **envp)
+{
+	t_msh	msh;
 
-// 	(void)ac;
-// 	(void)av;
-// 	init_env(&msh);
-// 	init_msh(&msh, envp);
-// 	init_expr(&msh);
-// 	shell_loop(&msh);
-// 	return (0);
-// }
+	(void)ac;
+	(void)av;
+	init_env(&msh);
+	init_msh(&msh, envp);
+	init_expr(&msh);
+	shell_loop(&msh);
+	return (0);
+}

@@ -6,115 +6,115 @@
 /*   By: dsy <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/04 18:40:28 by dsy               #+#    #+#             */
-/*   Updated: 2023/01/10 16:29:08 by dsy              ###   ########.fr       */
+/*   Updated: 2023/01/28 03:15:19 by dsy              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	output_redirection(char **field, int mode, int *fd_out)
+int	has_quote(char *str)
 {
-	int		j;
-	int		fd;
-	char	**expr;
+	int	i;
+	int	q;
 
-	j = 1;
-	fd = -1;
-	while (field[j])
+	q = 0;
+	i = 0;
+	while (str[i] && (str[i] != '>' || str[i] != '<'))
 	{
-		expr = ft_split(field[j], ' ');
-		if (mode == 1)
-			fd = open(expr[0], O_RDWR | O_CREAT | O_TRUNC, 0644);
-		if (mode == 2)
-			fd = open(expr[0], O_RDWR | O_CREAT | O_APPEND, 0644);
-		free_split(expr);
-		j++;
-	}
-	*fd_out = fd;
-	free_split(field);
-}
-
-static void	heredoc(char *expr)
-{
-	char	*tmp;
-
-	tmp = NULL;
-	while (1)
-	{
-		get_next_line(0, &tmp);
-		if (ft_strncmp(tmp, expr, ft_strlen(tmp)) == 0)
-			break ;
-		free(tmp);
-	}
-}
-
-static void	check_paths(char *prompt)
-{
-	char	**redir;
-	char	*expr;
-	int		i;
-
-	i = 1;
-	redir = ft_split_charset(prompt, "<>");
-	while (redir[i])
-	{
-		expr = remove_spaces(redir[i]);
-		if (access(expr, F_OK) == -1)
-		{
-			display_cmd_error(redir[i], PATH_ERROR, NULL);
-			free(expr);
-			free_split(redir);
-			exit(EXIT_FAILURE);
-		}
-		free(expr);
+		if (str[i] == '\"' || str[i] == '\'')
+			q++;
 		i++;
 	}
-	free_split(redir);
+	if ((q % 2) != 0)
+		return (1);
+	return (0);
 }
 
-static void	input_redirection(char **field, int mode, int *fd_in, char *prompt)
+int	check_quotes(char **redir, int *i)
 {
-	int		j;
-	int		fd;
-	char	**expr;
+	int	j;
+	int	quotes;
 
-	j = 1;
-	fd = -1;
-	check_paths(prompt);
-	while (field[j])
+	quotes = 0;
+	j = *i;
+	while (j > 0)
 	{
-		expr = ft_split(field[j], ' ');
-		if (mode == 1)
-			fd = open(expr[0], O_RDONLY);
-		if (mode == 2)
-			heredoc(expr[0]);
-		free_split(expr);
-		j++;
+		if (has_quote(redir[j]))
+			quotes++;
+		j--;
 	}
-	*fd_in = fd;
-	free_split(field);
+	return (quotes);
 }
 
-void	apply_redirections(char *expr, int *fd_in, int *fd_out)
+static int	is_heredoc(char *token, char **redirs)
+{
+	int		i;
+	int		j;
+	char	**tmp;
+
+	i = 0;
+	j = 0;
+	tmp = ft_split_charset(token, "<<");
+	while (tmp[i])
+		i++;
+	free_split(tmp);
+	if (i > 1)
+	{
+		while (token[j + 1])
+		{
+			if (token[j] == '<' && (token[j + 1] == '<'))
+			{
+				free_split(redirs);
+				return (1);
+			}
+			j++;
+		}
+	}
+	return (0);
+}
+
+static int	has_no_redir(char *expr)
+{
+	int	i;
+	int	red;
+
+	red = 0;
+	i = 0;
+	while (expr[i])
+	{
+		if (expr[i] == '>' || expr[i] == '<')
+			red = 1;
+		i++;
+	}
+	if (red == 1)
+		return (0);
+	return (1);
+}
+
+void	apply_redirections(char *expr, int *fd_in, int *fd_out, t_msh *msh)
 {
 	int		i;
 	char	**redirs;
+	int		*fds[2];
+	int		quotes;
 
 	i = 0;
-	(void)redirs;
+	if (has_no_redir(expr))
+		return ;
+	fds[0] = fd_in;
+	fds[1] = fd_out;
+	quotes = 0;
 	redirs = ft_split(expr, ' ');
 	while (redirs[i])
 	{
-		if (ft_strncmp(redirs[i], ">>", ft_strlen(">>")) == 0)
-			output_redirection(ft_split_charset(expr, ">"), 2, fd_out);
-		else if (ft_strncmp(redirs[i], ">", ft_strlen(">")) == 0)
-			output_redirection(ft_split_charset(expr, ">"), 1, fd_out);
-		else if (ft_strncmp(redirs[i], "<<", ft_strlen("<<")) == 0)
-			input_redirection(ft_split_charset(expr, "<<"), 2, fd_in, expr);
-		else if (ft_strncmp(redirs[i], "<", ft_strlen("<")) == 0)
-			input_redirection(ft_split_charset(expr, "<"), 1, fd_in, expr);
+		quotes = check_quotes(redirs, &i);
+		if (is_redir_token(redirs[i], redirs) && (quotes % 2 == 0))
+			handle_redir(expr, fds, &i, msh);
 		else
-			(void)redirs;
+		{
+			is_heredoc(redirs[i], redirs);
+			is_sneaky_token(expr, &i, fds, msh);
+		}
 		i++;
 	}
 	free_split(redirs);

@@ -12,6 +12,18 @@
 
 #include "libft.h"
 
+char	*ret_result(int i, int j, const char *s2, char *newstr)
+{
+	while (s2[j])
+	{
+		newstr[i] = s2[j];
+		i++;
+		j++;
+	}
+	newstr[i] = '\0';
+	return (newstr);
+}
+
 char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char	*newstr;
@@ -28,12 +40,10 @@ char	*ft_strjoin(char const *s1, char const *s2)
 		newstr[i] = s1[i];
 		i++;
 	}
-	while (s2[j])
+	if (s2 == NULL)
 	{
-		newstr[i] = s2[j];
-		i++;
-		j++;
+		newstr[i] = 0;
+		return (newstr);
 	}
-	newstr[i] = '\0';
-	return (newstr);
+	return (ret_result(i, j, s2, newstr));
 }

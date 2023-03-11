@@ -12,6 +12,18 @@
 
 #include "minishell.h"
 
+int	arr_len(char **arr)
+{
+	int	i;
+
+	i = 0;
+	if (!arr)
+		return (0);
+	while (arr[i] != NULL)
+		i++;
+	return (i);
+}
+
 int	display_error(char *error, t_msh *msh)
 {
 	if (!ft_strncmp(error, CWD_ERROR, ft_strlen(error)))
@@ -33,7 +45,18 @@ void	display_cmd_error(char *cmd, char *error, char **args)
 {
 	if (!ft_strncmp(error, PATH_ERROR, ft_strlen(error)))
 	{
-		ft_putnstr("minishell: ", cmd, ": ", args[1]);
+		if (args)
+			ft_putnstr("minishell: ", cmd, ": ", args[1]);
+		else
+			ft_putnstr("minishell: ", cmd, NULL, NULL);
+		ft_putstr(error);
+	}
+	if (!ft_strncmp(error, CMD_ERROR, ft_strlen(error)))
+	{
+		if (args)
+			ft_putnstr("minishell: ", cmd, ": ", args[1]);
+		else
+			ft_putnstr("minishell: ", cmd, NULL, NULL);
 		ft_putstr(error);
 	}
 }

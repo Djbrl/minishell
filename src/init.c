@@ -34,6 +34,8 @@ static void	init_fn_ptr(t_msh *msh)
 
 void	init_msh(t_msh *msh, char **envp)
 {
+	char	cwd[1024];
+
 	init_fn_ptr(msh);
 	msh->prompt = NULL;
 	msh->tokens = NULL;
@@ -48,7 +50,13 @@ void	init_msh(t_msh *msh, char **envp)
 	msh->full_path = NULL;
 	msh->exit_status = 0;
 	msh->nb_tokens = 0;
+	msh->last_valid_path = NULL;
+	msh->last_valid_path = getcwd(cwd, sizeof(cwd));
+	msh->std_in = dup(0);
+	msh->std_out = dup(1);
+	msh->single_quote = 0;
 	parse_envp(msh);
+	ft_memset(msh->g_buffer, 0, BUF);
 }
 
 void	init_expr(t_msh *msh)

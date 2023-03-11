@@ -6,47 +6,18 @@
 /*   By: dsy <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 14:26:32 by dsy               #+#    #+#             */
-/*   Updated: 2023/01/10 16:29:31 by dsy              ###   ########.fr       */
+/*   Updated: 2023/01/26 11:19:35 by dsy              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	free_envar(t_msh *msh)
+void	temp_exit(t_msh *msh)
 {
-	if (msh->home != NULL)
-		free(msh->home);
-	if (msh->user != NULL)
-		free(msh->user);
-	if (msh->full_path != NULL)
-		free(msh->full_path);
-	if (msh->default_path != NULL)
-		free(msh->default_path);
-	if (msh->paths != NULL)
-		free_split(msh->paths);
-}
-
-static void	free_env(t_msh *msh)
-{
-	t_env_var	*cur;
-
-	if (!msh->env)
-		return ;
-	while (msh->env->next != NULL)
-	{
-		cur = msh->env;
-		free(msh->env->data);
-		free(msh->env->name);
-		msh->env = msh->env->next;
-		free(cur);
-	}
-	if (msh->env)
-	{
-		free(msh->env->data);
-		free(msh->env->name);
-		free(msh->env);
-	}
-	free_envar(msh);
+	exit_cmd(msh);
+	free_env(msh);
+	free_expr(&msh);
+	clear_history();
 }
 
 void	free_split(char **array)
@@ -74,20 +45,3 @@ void	exit_cmd(t_msh *msh)
 		msh->tokens = NULL;
 	}
 }
-
-void	exit_shell(t_msh *msh)
-{
-	int		exit_status;
-
-	exit_status = 0;
-	free_env(msh);
-	if (msh->exp != NULL)
-	{
-		free(msh->exp->data);
-		free(msh->exp);
-	}
-	exit(exit_status);
-}
-/**
-** clear_history();
-**/

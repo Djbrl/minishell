@@ -19,10 +19,10 @@ int	string(char *str, char **rt, int i)
 
 	k = 0;
 	if (str[i] != '\'' && str[i] != '"' && !is_whitespace(str[i])
-		&& str[i] != '$' && !is_pipe_redir(str[i]))
+		&& !is_pipe_redir(str[i]))
 	{
 		k = i;
-		while (str[i] && (str[i] != '\'' && str[i] != '"' && str[i] != '$'
+		while (str[i] && (str[i] != '\'' && str[i] != '"'
 				&& !is_whitespace(str[i]) && !is_pipe_redir(str[i])))
 			i++;
 		tmp = malloc(sizeof(char) * i - k + 1);

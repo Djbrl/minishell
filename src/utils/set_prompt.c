@@ -1,36 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_isdigit.c                                       :+:      :+:    :+:   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dsy <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/15 15:09:27 by dsy               #+#    #+#             */
-/*   Updated: 2019/10/15 15:16:08 by dsy              ###   ########.fr       */
+/*   Created: 2019/11/21 02:10:51 by dsy               #+#    #+#             */
+/*   Updated: 2023/01/10 16:29:39 by dsy              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "minishell.h"
 
-int	ft_isdigit(int c)
-{
-	if (c >= '0' && c <= '9')
-		return (1);
-	return (0);
-}
-
-int	ft_isnum(char *str)
+static int	only_whitespaces(char *buf)
 {
 	int	i;
 
 	i = 0;
-	if (!str)
-		return (-1);
-	while (str[i])
+	while (buf[i])
 	{
-		if (!ft_isdigit(str[i]))
+		if (buf[i] != ' ' && buf[i] != '\t' && \
+			buf[i] != '\v' && buf[i] != '\n')
 			return (0);
 		i++;
 	}
 	return (1);
+}
+
+int	set_prompt(t_msh *msh)
+{
+	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, SIG_IGN);
+	read_buffer(msh);
+	msh->prompt = ft_strdup(msh->g_buffer);
+	if (msh->prompt != NULL && ft_strlen(msh->prompt) != 0 \
+			&& !only_whitespaces(msh->prompt))
+		return (1);
+	return (0);
 }

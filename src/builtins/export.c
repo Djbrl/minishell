@@ -68,6 +68,27 @@ static int	display_export_error(char *error, char *arg, t_msh *msh)
 	return (0);
 }
 
+static int	has_invalid_char(char *str)
+{
+	int		i;
+	char	*invalid_char;
+
+	i = 0;
+	invalid_char = ft_strdup("!#$%%&*()+,-./:;<>?@[]^`{|}~\n\t ");
+	while (str[i] && str[i] != '=')
+	{
+		if (ft_strchr(invalid_char, (int)str[i]) != NULL \
+			|| str[0] == '_')
+		{
+			free(invalid_char);
+			return (1);
+		}
+		i++;
+	}
+	free(invalid_char);
+	return (0);
+}
+
 /*
 ****************************STATIC FUNCTIONS****************************
 */
@@ -84,7 +105,7 @@ int	msh_export(t_env_var *env, char *arg, t_msh *msh)
 	i = 0;
 	name = NULL;
 	data = NULL;
-	if (arg == NULL || (!ft_isalpha(arg[0]) && arg[0] != '_'))
+	if (arg == NULL || has_invalid_char(arg))
 	{
 		display_export_error(ENV_ID_ERROR, arg, msh);
 		return (update_exit_status(msh, 1));

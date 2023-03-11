@@ -16,30 +16,27 @@
 ****************************STATIC FUNCTIONS****************************
 */
 
-static int	ftn_msh_cd(t_msh **msh, char **path, int ret)
-{
-	char	*p;
-	t_msh	*m;
+/*
+** create error cd. The directory "[name]" does not exist
+** if mhs->home NULL : bash: cd: HOME not set
+*/
 
-	m = *msh;
-	p = *path;
-	if (m->tokens[1])
-	{
-		if (m->tokens[1][0] == '$')
-			p = expand_var(m, m->tokens[1]);
-		else
-			p = ft_strdup(m->tokens[1]);
-	}
-	if (!m->tokens[1])
-	{
-		if (m->home != NULL)
-			ret = chdir(m->home);
-		else
-			ret = chdir("/");
-	}
+static int	ftn_msh_cd(t_msh **msh, int ret, char *field)
+{
+	char	**tokens;
+	int		free_tokens;
+
+	free_tokens = 0;
+	if (field == NULL)
+		tokens = (*msh)->tokens;
 	else
-		ret = chdir(p);
-	free(p);
+	{
+		tokens = ft_split(field, ' ');
+		free_tokens = 1;
+	}
+	ret = change_dir(msh, tokens);
+	if (free_tokens)
+		free_split(tokens);
 	return (ret);
 }
 
@@ -50,11 +47,12 @@ static int	ftn_msh_cd(t_msh **msh, char **path, int ret)
 char	*get_currentdir(t_msh *msh)
 {
 	char	*path;
+	char	*ret;
 	char	cwd[1024];
 	int		i;
 	int		last_slash;
 
-	i = 0;
+	i = -1;
 	last_slash = 0;
 	path = ft_strdup(getcwd(cwd, sizeof(cwd)));
 	if (!path)
@@ -62,17 +60,23 @@ char	*get_currentdir(t_msh *msh)
 		display_error(CWD_ERROR, msh);
 		return (NULL);
 	}
-	while (path[i])
+	if (ft_strlen(path) == 0)
 	{
+		free(path);
+		return (ft_strdup(" "));
+	}
+	while (path[++i])
 		if (path[i] == '/')
 			last_slash = i;
-		i++;
-	}
+	ret = ft_strdup(path + last_slash + 1);
 	free(path);
-	return (ft_strdup(path + last_slash + 1));
+	return (ret);
 }
 
-int	msh_cd_runner(t_env_var *env, t_msh *msh)
+/*
+**only if FIELD != NULL, also change it in echo
+*/
+int	msh_cd_runner(t_env_var *env, t_msh *msh, char *field)
 {
 	(void)msh;
 	if (msh->nb_tokens > 2)
@@ -82,18 +86,16 @@ int	msh_cd_runner(t_env_var *env, t_msh *msh)
 		return (update_exit_status(msh, 1));
 	}
 	else
-		return (update_exit_status(msh, msh_cd(env, msh)));
+		return (update_exit_status(msh, msh_cd(env, msh, field)));
 }
 
-int	msh_cd(t_env_var *env, t_msh *msh)
+int	msh_cd(t_env_var *env, t_msh *msh, char *field)
 {
 	int		ret;
-	char	*path;
 
 	(void)env;
 	ret = 0;
-	path = NULL;
-	ret = ftn_msh_cd(&msh, &path, ret);
+	ret = ftn_msh_cd(&msh, ret, field);
 	if (ret < 0)
 	{
 		display_cmd_error("cd", PATH_ERROR, msh->tokens);
@@ -101,5 +103,5 @@ int	msh_cd(t_env_var *env, t_msh *msh)
 		return (1);
 	}
 	exit_cmd(msh);
-	return (0);
+	return (ret);
 }

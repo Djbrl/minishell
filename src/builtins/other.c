@@ -12,55 +12,65 @@
 
 #include "minishell.h"
 
-int	msh_env(t_env_var *env, t_msh *msh)
+int	msh_env(t_env_var *env, t_msh *msh, char *field)
 {
 	t_env_var	*cur;
 	int			len;
 
 	(void)msh;
 	(void)env;
+	(void)field;
 	cur = env;
 	len = ft_strlen(cur->name);
 	while (cur->next != NULL)
 	{
 		if (cur->name && cur->data && \
 		ft_strncmp(cur->name, "init", len) != 0 && \
-		ft_strncmp(cur->name, "?", len) != 0)
+		ft_strncmp(cur->name, "?", len) != 0 && ft_strlen(cur->data) > 0)
 			ft_putnstr(cur->name, "=", cur->data, "\n");
 		cur = cur->next;
 	}
 	if (cur->name && cur->data && \
 	ft_strncmp(cur->name, "init", len) != 0 && \
-	ft_strncmp(cur->name, "?", len))
+	ft_strncmp(cur->name, "?", len) && ft_strlen(cur->data) > 0)
 		ft_putnstr(cur->name, "=", cur->data, "\n");
 	exit_cmd(msh);
 	return (update_exit_status(msh, 0));
 }
 
-int	msh_exit(t_env_var *env, t_msh *msh)
+int	msh_exit(t_env_var *env, t_msh *msh, char *field)
 {
-	int	exit_status;
+	int		exit_status;
 
-	exit_status = ft_atoi(get_data_from_env(env, ft_strdup("?")));
 	(void)env;
-	exit_cmd(msh);
-	exit_shell(msh);
-	return (exit_status);
+	if (!field)
+		exit_status = exit_shell(msh, msh->prompt);
+	else
+		exit_status = exit_shell(msh, field);
+	return (update_exit_status(msh, exit_status));
 }
 
-int	msh_pwd(t_env_var *env, t_msh *msh)
+int	msh_pwd(t_env_var *env, t_msh *msh, char *field)
 {
 	char	cwd[1024];
 
+	(void)field;
 	(void)msh;
 	(void)env;
-	ft_putnstr(getcwd(cwd, sizeof(cwd)), "\n", NULL, NULL);
+	if (getcwd(cwd, sizeof(cwd)) == NULL)
+	{
+		printf(PWD_ERR);
+		update_exit_status(msh, 1);
+	}
+	else
+		ft_putnstr(getcwd(cwd, sizeof(cwd)), "\n", NULL, NULL);
 	exit_cmd(msh);
 	return (update_exit_status(msh, 0));
 }
 
-int	msh_help(t_env_var *env, t_msh *msh)
+int	msh_help(t_env_var *env, t_msh *msh, char *field)
 {
+	(void)field;
 	(void)msh;
 	(void)env;
 	ft_putstr("\nminishell-4.2 commands: \n\necho\t\t: a clone of bash echo\n");

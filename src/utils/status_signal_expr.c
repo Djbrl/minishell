@@ -17,8 +17,13 @@ void	signal_handler(int sig_n)
 	if (sig_n == SIGINT)
 	{
 		write(1, "\n", 1);
-		write(1, PROMPTLINE, ft_strlen(PROMPTLINE));
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+		g_status = 130;
 	}
+	else if (sig_n == SIGQUIT)
+		return ;
 	else
 		return ;
 }
@@ -46,6 +51,14 @@ char	*remove_spaces(const char *str)
 	return (res);
 }
 
+void	close_redir(int in, int out)
+{
+	if (in != -1)
+		dup2(in, 0);
+	if (out != -1)
+		dup2(out, 1);
+}
+
 int	expr_len(t_expr *expr)
 {
 	t_expr	*cur;
@@ -65,8 +78,14 @@ int	update_exit_status(t_msh *msh, int status)
 {
 	char	*tmp;
 
+	if (status == 256)
+		status = 127;
+	if (status == 512)
+		status = 2;
 	tmp = ft_itoa(status);
 	add_var_to_env(msh->env, "?", tmp);
+	g_status = status;
+	msh->exit_status = status;
 	free(tmp);
 	return (status);
 }
